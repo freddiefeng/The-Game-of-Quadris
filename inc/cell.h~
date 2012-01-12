@@ -1,0 +1,25 @@
+#ifndef __CELL_H__
+#define __CELL_H__
+#include "component.h"
+#include "block.h"
+#include "coordinate.h"
+
+class Cell : public Component {
+ private:
+  char _symbol; // The symbol of the cell
+  int _color; // The color of the cell
+  bool _occupied; // Set to true if the block of which is on the pile
+  Block* block; // Pointer to the block the cell belongs to
+ public:
+  Cell(char, int, Block*); // Default constructor
+  ~Cell(); // Destructor
+
+  char getSymbol(); // Gets the symbol of the cell for text display
+  Coordinate getCoord(); // Gets the coordinate of the cell
+  Block* getBlock(); // Gets pointer to the block that the cell belongs to
+  bool isOccupied(); // Returns true if the cell is occupied
+  void UnOccupy(); // Clears the cell
+  void drawText(); // Draws text representation to standard output
+};
+
+#endif

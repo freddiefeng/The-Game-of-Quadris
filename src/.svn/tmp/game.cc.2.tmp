@@ -1,0 +1,125 @@
+#include "game.h"
+#include "level0.h"
+#include "level1.h"
+#include "level2.h"
+#include "level3.h"
+
+using namespace std;
+
+Game::Game(GDisplay* pMainBoardDisplay, GDisplay* pSubBoardDisplay, int level, uint32_t seed)
+{
+  _mainBoard = new Board(pMainBoardDisplay, mainBoardHeight, mainBoardWidth);
+  _subBoard = new Board(pSubBoardDisplay, subBoardHeight, subBoardWidth);
+  _score = new Score;
+  _seed = seed;
+
+  //Use level to see what Level object to assign _level to
+  if (level == 1) {
+    _level = new Level1(_seed);
+  } else if (level == 2) {
+    _level = new Level2(_seed);
+  } else if (level == 3) {
+    _level = new Level3(_seed);
+  } else {
+    _level = new Level0; 
+  }
+
+  _currentBlock = _level->getNextBlock((Coordinate){0, 4}, _mainBoard);
+  _nextBlock = _level->getNextBlock((Coordinate){0, 3}, _subBoard);
+
+  _currentBlock->Show();
+  _nextBlock->Show();
+
+  drawText();
+}
+
+Game::~Game()
+{
+  delete _mainBoard;
+  delete _subBoard;
+  
+  for(list<Block*>::iterator it = _aliveBlocks.begin(); it != _aliveBlocks.end(); it++)
+    {
+      delete *it;
+    }
+
+  delete _score;
+  delete _level;
+}
+
+Level* Game::getLevel()
+{
+  return _level;
+}
+
+Block* Game::getCurrentBlock()
+{
+  return _currentBlock;
+}
+
+void Game::getNextBlock()
+{
+  *_currentBlock =* _nextBlock;
+  _currentBlock->setBoard(_mainBoard, 0, 3);  //Change the board currentBlock is in
+  delete _nextBlock;
+  _nextBlock = _level->getNextBlock((Coordinate){0, 0}, _subBoard);
+}
+
+//Method to change the level of the game to the one specified as a parameter.
+void Game::changeLevel(int nLevel) {
+  //Set _level to be of a specific level subclass depending on the value of 
+  //"nLevel"
+  if (nLevel == 0) {
+    delete _level;
+    _level = new Level0();  //Any value of "nLevel" that isn't the above is Level0
+  } else if (nLevel == 1) {
+    delete _level;
+    _level = new Level1(_seed);
+  } else if (nLevel == 2) {
+    delete _level;
+    _level = new Level2(_seed);
+  } else if (nLevel == 3) {
+    delete _level;
+    _level = new Level3(_seed);
+  }
+}
+
+void Game::computeScore()
+{
+  // Reduce rows and compute the score accumulated through row reduction
+  _mainBoard->reduceRows(_score, _level);
+  
+  for(list<Block*>::iterator it = _aliveBlocks.begin(); it != _aliveBlocks.end(); it++)
+    {
+      Block* pBlock = *it;
+
+      if(pBlock->isEmpty())
+	{
+	  int blockLevel = pBlock->getLevel();
+	  _score->Add((blockLevel + 1) * (blockLevel + 1));
+
+	  delete pBlock;
+	  _aliveBlocks.erase(it);
+	}
+    }
+}
+
+void Game::restart()
+{
+  _mainBoard->clearBoard();
+  _subBoard->clearBoard();
+
+  _score->reset();
+}
+
+void Game::drawText()
+{
+  _level->drawText();
+  _score->drawText();
+  cout << "----------" << endl;
+  _mainBoard->drawText();
+  cout << "----------" << endl;
+  cout << "Next:" << endl;
+  _subBoard->drawText();
+  cout << endl;
+}

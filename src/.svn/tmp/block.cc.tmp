@@ -1,0 +1,206 @@
+#include "block.h"
+
+using namespace std;
+
+Block::Block(char symbol, Coordinate refCoord, int level, Board* pB) : _symbol(symbol),
+							               _refCoord(refCoord),
+							               _level(level),
+                                                                       _pBoard(pB)
+{
+  initialize();
+}
+
+Block::~Block()
+{
+  for(list<cell*>::iterator it = _cells.begin(); it != _cells; it++)
+    {
+      it->UnOccupy();
+    }
+}
+
+// Gets the level of the block
+int Block::getLevel()
+{
+  return _level;
+}
+
+// Removes the reference to the cell from the cell list
+void Block::removeCell(Cell* pCell)
+{
+  for(list<Cell*>::iterator it = _cells.begin(); it != _cells.end(); it++)
+    {
+      if((*it) == pCell)
+	{
+	  _cells.erase(it);
+	}
+    }
+}
+
+// Returns true if all the cells are removed
+bool Block::isEmpty()
+{
+  return _cells.empty();
+}
+
+// Drops the block to the pile
+void Block::Fall()
+{
+  int minGap = 0;
+  int index;
+
+  // Computes the minimun gap between the cells to the pile of cells below
+  for(list<Cell*>::iterator it = _cells.begin(); it != _cells.end(); it++)
+    {
+      Coordinate coord = it->getCoord();
+
+      for(index = coord.yCoord; index > 0; index--)
+	{
+	  // Finds the first occupied cell below the current cell in the same column
+	  if(!pBoard->isAvailable((Coordinate){coord.xCoord, i}))
+	    {
+	      break;
+	    }
+	}
+
+      if(minGap > coord.yCoord - index)
+	{
+	  minGap = coord.yCoord - index;
+	}
+    }
+
+  Coordinate newCoord, oldCoord;
+
+  if(minGap != 0)
+    {
+      for(list<Cell*>::iterator it = _cells.begin(); it != _cells.end(); it++)
+	{
+	  // Compute the coordinate of the dropped cell
+	  oldCoord = it->getCoord();
+	  newCoord = {oldCoord.xCoord, oldCoord.yCoord - minGap};
+
+	  // Clears the cell on the actual board
+	  it->UnOccupy();
+
+	  // Removes the reference from the list
+	  _cells.erase(it);
+
+	  // Sets the new cell through the board
+	  // and insert it to the cell list
+	  _cells.insert((pBoard->getCell(newCoord))->updateCell(this, _symbol, _color, true));
+	}
+      
+      // Update the reference coordinate
+      _refCoord -= minGap;
+    }
+}
+
+// Shifts the block to the right
+void Block::Shift_Right()
+{
+  // Checks if right shift is possible
+  for(list<Cell*>::iterator it = _cells.being(); it != _cells.end(); it++)
+    {
+      Coordinate coord = it->getCoord();
+
+      if(!pBoard->isAvailable((Coordinate){coord.xCoord + 1, coord.yCoord}))
+	{
+	  return;
+	}
+    }
+
+  Coordinate newCoord, oldCoord;
+
+  for(list<Cell*>::iterator it = _cells.begin(); it != _cells.end(); it++)
+    {
+      // Compute the coordinate of the dropped cell
+      oldCoord = it->getCoord();
+      newCoord = {oldCoord.xCoord + 1, oldCoord.yCoord};
+
+      // Clears the cell on the actual board
+      it->UnOccupy();
+
+      // Removes the reference from the list
+      _cells.erase(it);
+
+      // Sets the new cell through the board
+      // and insert its address to the cell list
+      _cells.insert((pBoard->getCell(newCoord))->setCell(this, _symbol, _color));
+    }
+
+  // Update the reference coordinate
+  _refCoord.xCoord++;
+}
+
+// Shifts the block to the left
+void Block::Shift_Left()
+{
+  // Checks if left shift is possible
+  for(list<Cell*>::iterator it = _cells.begin(); it != _cells.end(); it++)
+    {
+      Coordinate coord = it->getCoord();
+
+      if(!pBoard->isAvailable((Coordinate){coord.xCoord - 1, coord.yCoord}))
+	{
+	  return;
+	}
+    }
+
+  Coordinate newCoord, oldCoord;
+
+  for(list<Cell*>::iterator it = _cells.being(); it != _cells.end(); it++)
+    {
+      // Compute the coordinate of the dropped cell
+      oldCoord = it->getCoord();
+      newCoord = {oldCoord.xCoord - 1, oldCoord.yCoord};
+
+      // Clears the cell on the actual board
+      it->UnOccupy();
+
+      // Removes the reference from the list
+      _cells.erase(it);
+
+      // Sets the new cell through the board
+      // and insert its address to the cell list
+      _cells.insert((pBoard->getCell(newCoord))->setCell(this, _symbol, _color));
+    }
+
+  // Update the reference coordinate
+  _refCoord.xCoord--;
+}
+
+// Shifts the block down
+void Block::Shift_Down()
+{
+  // Checks if shifting downward is possible
+  for(list<Cell*>::iterator it = _cells.begin(); it != _cells.end(); it++)
+    {
+      Coordinate coord = it->getCoord();
+
+      if(!pBoard->isAvailable((Coordinate){coord.xCoord, coord.yCoord - 1}))
+	{
+	  return;
+	}
+    }
+
+  Coordinate newCoord, oldCoord;
+
+  for(list<Cell*>::iterator it = _cells.being(); it != _cells.end(); it++)
+    {
+      // Compute the coordinate of the dropped cell
+      oldCoord = it->getCoord();
+      newCoord = {oldCoord.xCoord, oldCoord.yCoord - 1};
+
+      // Clears the cell on the actual board
+      it->UnOccupy();
+
+      // Removes the reference from the list
+      _cells.erase(it);
+
+      // Sets the new cell through the board
+      // and insert its address to the cell list
+      _cells.insert(pBoard->setCell(this, _symbol, _color));
+    }
+
+  // Update the reference coordinate
+  _refCoord.yCoord--;
+}

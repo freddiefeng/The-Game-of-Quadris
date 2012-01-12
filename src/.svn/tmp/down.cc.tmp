@@ -1,0 +1,9 @@
+#include "down.h"
+
+Down::Down(Game* pGame) : Command(pGame)
+{
+}
+
+void Down::Execute() {
+  (_pGame->getCurrentBlock())->Shift_Down();
+}

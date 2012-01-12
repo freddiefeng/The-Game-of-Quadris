@@ -1,0 +1,70 @@
+OBJDIR=out
+SRCDIR=src
+BINDIR=bin
+TSTDIR=test
+INCDIR=inc
+DEPDIR=deps
+INCLUDE=-I${INCDIR}
+CXX=g++
+CXXFLAGS=-I${INCDIR} -g -Wall -c
+SOURCES=${wildcard ${SRCDIR}/*.cc}
+OBJECTS=${patsubst ${SRCDIR}/%.cc, ${OBJDIR}/%.o,${SOURCES}}
+EXEC=Quaris
+cmdTestBuild=${CXX} -g -Wall ${INCLUDE} $^ $(TSTDIR)/$@.cc -o $(BINDIR)/$@
+
+vpath %.test.cc ${TSTDIR}
+vpath %.test.o ${BINDIR}
+vpath %.cc ${SRCDIR}
+vpath %.o ${OBJDIR}
+vpath %.h ${INCDIR}
+
+${OBJDIR}/command.o : command.cc game.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/game.o : game.cc component.o cell.o score.o level.o board.o block.o iblock.o jblock.o lblock.o tblock.o zblock.o sblock.o oblock.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/oblock.o : oblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/sblock.o : sblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/zblock.o : zblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/tblock.o : tblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/lblock.o : lblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/jblock.o : jblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/iblock.o : iblock.cc block.o board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/block.o : block.cc board.o cell.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/board.o : board.cc component.o cell.o score.o level.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/level.o : level.cc gdisplay.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/score.o : score.cc gdisplay.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/cell.o : cell.cc gdisplay.o
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/component.o : component.cc gdisplay.cc
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/gdisplay.o : gdisplay.cc
+	$(CXX) ${CXXFLAGS} $< -o $@
+
+${OBJDIR}/%.o : $(addprefix $(SRCDIR)/, %.cc)
+	$(CXX) ${CXXFLAGS} $< -o $@

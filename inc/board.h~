@@ -1,0 +1,25 @@
+#ifndef __BOARD_H__
+#define __BOARD_H__
+#inlucde "component.h"
+#include "coordinate.h"
+#include "cell.h"
+#include "score.h"
+
+class Board : public Component{
+  Cell** grid;
+  const int boardHeight;
+  const int boardWidth;
+ public:
+  Board(int, int);
+  ~Board();
+
+  Cell* getCell(Coordinate); // Gets pointer to the cell specified by the coordinate
+  Cell* setCell(Block*, char, int, bool = false); // Sets the cell properties
+  bool isAvailable(Coordinate); // Returns true if the inquired cell is not occupied and within bound
+  bool isRowFull(int); // Returns true if the inquired row is full
+  void reduceRows(Score*, Level*); // Reduces the rows to compute the score
+  void clearBoard(); // Clears the whole board
+  void drawText(); // Draws text to the standard output
+};
+
+#endif

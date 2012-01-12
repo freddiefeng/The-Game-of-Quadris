@@ -1,0 +1,82 @@
+#include "game.h"
+
+Game::Game(GDisplay* pMainBoardDisplay, GDisplay* pSubBoardDisplay, int level) : Component(new GDisplay)
+{
+  _mainBoard = new Board(pMainBoardDisplay, mainBoardHeight, mainBoardWidth);
+  _subBoard = new Board(pSubBoardDisplay, subBoardHeight, subBoardWidth);
+  _currentBlock = getNextBlock();
+  _nextBlock = getNextBlock();
+  _score = new Score(0);
+  _level = new Level(level);
+}
+
+Game::~Game()
+{
+  delete _mainBoard;
+  delete _subBoard;
+  
+  for(list<Block*>::iterator it = _aliveBlocks.begin(); it != _aliveBlocks.end(); it++)
+    {
+      delete *it;
+    }
+
+  delete _score;
+  delete _level;
+}
+
+Level* Game::getLevel()
+{
+  return _level;
+}
+
+Block* Game::getCurrentBlock()
+{
+  return _currentBlock;
+}
+
+void Game::getNextBlock()
+{
+  _currentBlock = _nextBlock;
+  delete _nextBlock;
+  _nextBlock = _level.getNextBlock();
+}
+
+void Game::computeScore()
+{
+  // Reduce rows and compute the score accumulated through row reduction
+  _mainBoard.reduceRows(_score, _level);
+  
+  for(list<Block*>::iterator it = _aliveBlocks.begin(); it != _aliveBlocks.end(); it++)
+    {
+      Block* pBlock = *it;
+
+      if(pBlock->isEmpty())
+	{
+	  int blockLevel = pBlock->getLevel();
+	  _score->Add((blockLevel + 1) * (blockLevel + 1));
+
+	  delete pBlock;
+	  _aliveBlocks.erase(it);
+	}
+    }
+}
+
+void Game::restart()
+{
+  _mainBoard.clearBoard();
+  _subBoard.clearBoard();
+
+  _score.reset();
+  _level.reset();
+}
+
+void Game::drawText()
+{
+  _level->drawText();
+  _score->drawText();
+  cout << "----------" << endl;
+  _mainBoard->drawText();
+  cout << "----------" << endl;
+  cout << "Next:" << endl;
+  _subBoard->drawText();
+}

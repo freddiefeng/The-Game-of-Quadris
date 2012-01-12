@@ -1,0 +1,9 @@
+#include "component.h"
+
+// Constructor
+void Component::Component()
+{}
+
+// Destructor
+virtual void Component::~Component()
+{}

@@ -1,0 +1,113 @@
+#include "board.h"
+
+using namespace std;
+
+Board::Board(GDisplay* pGDisplay, int boardHeight, int boardWidth) : Component(pGDisplay)
+{
+  this->boardHeight = boardHeight;
+  this->boardWidth = boardWidth;
+
+  for(int i = 0; i < boardHeight; i++)
+    {
+      for(int j = 0; j < boardWidth; j++)
+	{
+	  grid[i][j] = new Cell(pGDisplay);
+	}
+    }
+}
+
+Board::~Board()
+{
+  for(int i = 0; i < boardHeight; i++)
+    {
+      for(int j = 0; j < boardWidth; j++)
+	{
+	  delete grid[i][j];
+	}
+    }
+}
+
+Cell* Board::getCell(Coordinate coord)
+{
+  int x = coord.xCoord;
+  int y = coord.yCoord;
+
+  if(0 <= x && x < boardWidth || 0 < y && ycoord.xCoord < boardHeigt)
+  return grid[x][y];
+}
+
+bool Board::isAvailable(Coordinate coord)
+{
+  return grid[coord.xCoord][coord.yCoord]->isOccupied();
+}
+
+bool Board::isRowFull(int row)
+{
+  for(int i = 0; i < boardWidth; i++)
+    {
+      if(!grid[row][i]->isOccupied())
+	return false;
+    }
+
+  return true;
+}
+
+void Board::deleteRow(int row)
+{
+  for(int i = 0; i < boardWidth; i++)
+    {
+      grid[row][i]->UnOccupied();
+    }
+
+  for(int i = row + 1; i < boardHeight ; i++)
+    {
+      for(int j = 0; j < boardWidth; j++)
+	{
+	  if(!grid[i][j]->isAvailable())
+	    {
+	      *(grid[i - 1][j]) = *(grid[i][j]);
+	      grid[i][j]->UnOccupy();
+	    }
+	}
+    }
+}
+
+void Board::reduceRows(Score* pScore, Level* pLevel)
+{
+  int nReducedRows = 0;
+
+  for(int i = 0; i < boardHeight; i++)
+    {
+      while(isRowFull(i))
+	{
+	  nReduceRows++;
+	  deleteRow(i);
+	} 
+    }
+
+  pScore->Add((nReducedRows * pLevel->getLevel()) * (nReducedRows * pLevel->getLevel()));
+}
+
+//Note: This function will call cell's destructor
+void Board::clearBoard()
+{
+  for(int i = 0; i < boardHeight; i++)
+    {
+      for(int j = 0; j < boardWidth; j++)
+	{
+	  delete grid[i][j;]
+	}
+    }
+}
+
+void Board::drawText()
+{
+  for(int i = 0; i < boardHeight; i++)
+    {
+      for(int j = 0; j < boardWidth; j++)
+	{
+	  grid[i][j]->drawText();
+	}
+      cout << endl;
+    }
+}

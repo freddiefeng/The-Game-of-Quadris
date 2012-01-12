@@ -1,0 +1,36 @@
+#ifndef __BLOCK_H__
+#define __BLOCK_H__
+#include "board.h"
+#include "coordinate.h"
+#include "cell.h"
+
+class Block {
+ protected:
+  char _symbol; // The symbol of the block
+  // The reference coordinate of the block, by default it is the left bottom corner
+  Coordinate _refCoord;
+  std::list<Cell*> _cells; // The list of references to cells that make up the block
+  int _rState; // The rotate state of the block
+  int _level; // The level at which the block is generated
+  int _color; // The color of the block
+
+  //TODO: enumeration of the RoateStates
+
+  virtual void initialize() = 0;
+
+ public:
+  // Constructor that accepts the symbol, reference coordinate and level as input
+  Block(char, Coordinate, int);
+  virtual ~Block(); // Destructor
+
+  int getLevel(); // Gets the level of the block
+  void removeCell(Cell*); // Removes the reference to the cell from the cell list
+  bool isEmpty(); // Returns true if all the cells are removed
+  virtual void Rotate_CW(Board*) = 0; // Rotates the block in clockwise direction
+  virtual void Rotate_CCW(Board*) = 0; // Rotates the block in clockwise direction
+  void Fall(Board*); // Drops the block to the pile
+  void Shift_Left(Board*); // Shifts the block to the left
+  void Shift_Right(Board*); // Shifts the block to the right
+};
+
+#endif

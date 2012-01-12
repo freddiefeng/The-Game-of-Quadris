@@ -1,0 +1,75 @@
+#include "cell.h"
+
+using namespace std;
+
+Cell::Cell(GDisplay* pGDisplay, char symbol = ' ', int color = Xwindow::White, Block* pBlock = NULL) : Component(pGDisplay), _symbol(symbol), _color(color), _block(pBlock)
+{
+}
+
+Cell::Cell(const Cell &cell) : Component(cell)
+{
+  _symbol = cell._symbol;
+  _color = cell._color;
+  _occupied = cell._occupied;
+  _block = cell._block;
+  _coord.xCoord = cell._coord.xCoord;
+  _coord.yCoord = cell._coord.yCoord;
+}
+
+Cell::~Cell(){}
+
+// Gets the symbol of the cell for text display
+char Cell::getSymbol()
+{
+  return _symbol;
+}
+
+// Gets the coordinate of the cell
+Coordinate Cell::getCoord()
+{
+  return _coord;
+}
+
+// Gets pointer to the block that the cell belongs to
+Block* Cell::getBlock()
+{
+  return _block;
+}
+
+// Update the properties of the cell
+Cell* Cell::updateCell(Block* block, char symbol, int color, bool occupied)
+{
+  _block = block;
+  _symbol = symbol;
+  _color = color;
+  _occupied = occupied;
+
+  _gameDisplay->drawCell(_coord.xCoord, _coord.yCoord, _color);
+  return this;
+}
+
+// Returns true if the cell is occupied
+bool Cell::isOccupied()
+{
+  return _occupied;
+}
+
+// Clear the cell
+void Cell::UnOccupy()
+{
+  _block->removeCell(this);
+
+  _symbol = ' ';
+  _color = Xwindow::White;
+  _occupied = false;
+  _block = NULL;
+  _coord = (Coordinate){-1, -1};
+
+  _gameDisplay->undrawCell(_coord.xCoord, _coord.yCoord);
+}
+
+// Draws text representation to standard output
+void Cell::drawText()
+{
+  cout << _symbol;
+}
