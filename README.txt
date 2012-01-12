@@ -1,4 +1,4 @@
-Contributor: Guoyao Feng(Freddie), Alvin Thai Tran(Alvin)
+Contributor: Guoyao Feng(Freddie), Alvin Tran(Alvin)
 
 Compilation
 --------------------
@@ -48,4 +48,4 @@ The scale is adjustable inside the gdisplay.cc file under src directory.
 
 Documentation
 --------------------
-The documents for due date 1 and due date 2 are all included inside the doc directory
+The UML diagrams can be found inside the doc directory.
