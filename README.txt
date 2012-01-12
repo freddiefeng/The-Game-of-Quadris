@@ -1,4 +1,4 @@
-Contributor: Guoyao Feng(Freddie), Al Thai Tran(Alvin)
+Contributor: Guoyao Feng(Freddie), Alvin Thai Tran(Alvin)
 
 Compilation
 --------------------
